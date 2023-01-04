@@ -29,7 +29,7 @@ class Habit(Base):
     description = Column(String)
     type = Column(
         String,
-        CheckConstraint("type='boolean' OR type='numeric'"),
+        CheckConstraint("type='boolean' OR type='numerical'"),
         nullable=False,
         default="boolean",
     )
@@ -47,7 +47,7 @@ class HabitDay(Base):
     id = Column(Integer, primary_key=True)
     habit_id = Column(Integer, ForeignKey("habits.id"), nullable=False)
     habit = relationship("Habit", backref=backref("habit_days", order_by=id))
-    date = Column(Date, nullable=False)
+    date = Column(Date, nullable=False, default=datetime.datetime.utcnow)
     completed = Column(Boolean, nullable=False, default=False)
     completed_num = Column(Integer, nullable=False, default=0)
 
