@@ -11,6 +11,10 @@ from ritmo.session import session
 def mark_done(name: str):
     """
     Mark a habit as done.
+    If the habit is of type 'numerical', the number of completed days will be incremented.
+
+    Args:
+        name: The name of the habit to mark as done. If the habit does not exist, it will not be created.
     """
 
     Session = session.create_local_session()
@@ -50,6 +54,11 @@ def mark_done(name: str):
 def mark_undone(name: str):
     """
     Mark a habit as undone.
+    If the habit is of type 'numerical', the number of times completed will be decremented. If the number of times completed
+    reaches 0, the habit_day will be deleted.
+
+    Args:
+        name: The name of the habit to mark as undone.
     """
 
     Session = session.create_local_session()

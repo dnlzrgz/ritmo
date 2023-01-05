@@ -47,6 +47,13 @@ def add_habit(
 ):
     """
     Add a new habit to the tracking system.
+
+    Args:
+        name: The name of the habit.
+        description: A description of the habit.
+        type: The type of tracking system to use.
+        start_date: The date the habit starts.
+        end_date: The date the habit ends.
     """
 
     if end_date and start_date and end_date < start_date:
@@ -130,6 +137,14 @@ def update_habit(
 ):
     """
     Update a habit.
+
+    Args:
+        name: The name of the habit.
+        new_name: The new name of the habit.
+        description: A description of the habit.
+        type: The type of tracking system to use.
+        start_date: The date the habit starts.
+        end_date: The date the habit ends.
     """
 
     if not name:
@@ -164,6 +179,9 @@ def update_habit(
 def delete_habit(name: str):
     """
     Delete a habit.
+
+    Args:
+        name: The name of the habit.
     """
 
     Session = session.create_local_session()

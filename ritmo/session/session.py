@@ -8,7 +8,10 @@ from ritmo.models import models
 
 def create_session(path: str) -> sessionmaker:
     """
-    Create a new session for the database.
+    Create a new session for the database at the given path.
+
+    Args:
+        path: The path to the database. It must be a valid SQLAlchemy connection string.
     """
 
     Session = sessionmaker()
@@ -22,6 +25,10 @@ def create_session(path: str) -> sessionmaker:
 
 
 def create_local_session() -> sessionmaker:
+    """
+    Create a new session for a local database at ~/.ritmo/ritmo.db.
+    """
+
     home_dir = Path.home()
 
     config_folder = home_dir / ".ritmo"
