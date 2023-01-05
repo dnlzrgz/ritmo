@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -17,3 +19,14 @@ def create_session(path: str) -> sessionmaker:
     Session.configure(bind=engine)
 
     return Session
+
+
+def create_local_session() -> sessionmaker:
+    home_dir = Path.home()
+
+    config_folder = home_dir / ".ritmo"
+    config_folder.mkdir(exist_ok=True)
+
+    db_path = config_folder / "ritmo.db"
+
+    return create_session(f"sqlite:///{db_path}")

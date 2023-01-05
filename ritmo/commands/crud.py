@@ -7,14 +7,7 @@ from ritmo.session import session
 
 
 @click.command(name="add", help="Add a new habit.")
-@click.option(
-    "--name",
-    "-n",
-    prompt="Habit name",
-    prompt_required=True,
-    help="Name of the habit.",
-    required=True,
-)
+@click.argument("name", nargs=1, type=str, required=True)
 @click.option(
     "--description",
     "-d",
@@ -60,10 +53,15 @@ def add_habit(
         click.echo("End date must be after start date.")
         return
 
-    Session = session.create_session("sqlite:///habit.db")
+    Session = session.create_local_session()
     with Session.begin() as sess:
-        sess.add(models.Habit(name=name, description=description, type=type))
-        sess.commit()
+        habit = sess.query(models.Habit).filter(models.Habit.name == name).first()
+
+        if habit:
+            return
+        else:
+            sess.add(models.Habit(name=name, description=description, type=type))
+            sess.commit()
 
 
 @click.command(name="list", help="List habits.")
@@ -72,7 +70,7 @@ def list_habits():
     List all habits.
     """
 
-    Session = session.create_session("sqlite:///habit.db")
+    Session = session.create_local_session()
     with Session.begin() as sess:
         habits = sess.query(models.Habit).all()
         for habit in habits:
@@ -84,13 +82,13 @@ def list_habits():
 
 
 @click.command(name="update", help="Update an existing habit.")
+@click.argument("name", nargs=1, type=str)
 @click.option(
-    "--name",
+    "--new-name",
     "-n",
     prompt="Habit name",
-    prompt_required=True,
+    prompt_required=False,
     help="Name of the habit.",
-    required=True,
 )
 @click.option(
     "--description",
@@ -124,6 +122,7 @@ def list_habits():
 )
 def update_habit(
     name: str,
+    new_name: str,
     description: str,
     type: str,
     start_date: datetime.datetime,
@@ -133,14 +132,20 @@ def update_habit(
     Update a habit.
     """
 
+    if not name:
+        click.echo("Habit name must be provided.")
+        return
+
     if end_date and start_date and end_date < start_date:
         click.echo("End date must be after start date.")
         return
 
-    Session = session.create_session("sqlite:///habit.db")
+    Session = session.create_local_session()
     with Session.begin() as sess:
         habit = sess.query(models.Habit).filter(models.Habit.name == name).first()
         if habit:
+            if new_name:
+                habit.name = new_name
             if description:
                 habit.description = description
             if type:
@@ -155,20 +160,13 @@ def update_habit(
 
 
 @click.command(name="delete", help="Delete a habit.")
-@click.option(
-    "--name",
-    "-n",
-    prompt="Habit name",
-    prompt_required=True,
-    help="Name of the habit.",
-    required=True,
-)
+@click.argument("name", nargs=1, type=str, required=True)
 def delete_habit(name: str):
     """
     Delete a habit.
     """
 
-    Session = session.create_session("sqlite:///habit.db")
+    Session = session.create_local_session()
     with Session.begin() as sess:
         habit = sess.query(models.Habit).filter(models.Habit.name == name).first()
 

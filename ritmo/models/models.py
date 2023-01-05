@@ -48,8 +48,8 @@ class HabitDay(Base):
     habit_id = Column(Integer, ForeignKey("habits.id"), nullable=False)
     habit = relationship("Habit", backref=backref("habit_days", order_by=id))
     date = Column(Date, nullable=False, default=datetime.datetime.utcnow)
-    completed = Column(Boolean, nullable=False, default=False)
-    completed_num = Column(Integer, nullable=False, default=0)
+    completed = Column(Boolean, nullable=False, default=True)
+    completed_num = Column(Integer, nullable=False, default=1)
 
 
 class HabitWeek(Base):
