@@ -1,6 +1,7 @@
 import click
 
 from ritmo.commands.crud import add_habit, delete_habit, list_habits, update_habit
+from ritmo.commands.date import show_date, show_today
 from ritmo.commands.manage import mark_done, mark_undone
 
 
@@ -15,6 +16,8 @@ cli.add_command(update_habit)
 cli.add_command(delete_habit)
 cli.add_command(mark_done)
 cli.add_command(mark_undone)
+cli.add_command(show_date)
+cli.add_command(show_today)
 
 
 def run():
