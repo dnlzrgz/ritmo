@@ -40,8 +40,8 @@ from ritmo.models import models
     type=click.DateTime(formats=["%Y-%m-%d"]),
     help="End date in 'Y-m-d' format.",
 )
-@decorators.command_with_local_session
-@decorators.command_with_sqlalchemy_error_handling
+@decorators.with_database
+@decorators.with_sqlalchemy_error_handling
 def add_habit(
     sess,
     name: str,
@@ -76,8 +76,8 @@ def add_habit(
 
 
 @click.command(name="list", help="List habits.")
-@decorators.command_with_local_session
-@decorators.command_with_sqlalchemy_error_handling
+@decorators.with_database
+@decorators.with_sqlalchemy_error_handling
 def list_habits(sess):
     """
     List all habits.
@@ -146,8 +146,8 @@ def list_habits(sess):
     type=click.DateTime(formats=["%Y-%m-%d"]),
     help="End date in UTC format",
 )
-@decorators.command_with_local_session
-@decorators.command_with_sqlalchemy_error_handling
+@decorators.with_database
+@decorators.with_sqlalchemy_error_handling
 def update_habit(
     sess,
     name: str,
@@ -197,8 +197,8 @@ def update_habit(
 
 @click.command(name="delete", help="Delete a habit.")
 @click.argument("name", nargs=1, type=str, required=True)
-@decorators.command_with_local_session
-@decorators.command_with_sqlalchemy_error_handling
+@decorators.with_database
+@decorators.with_sqlalchemy_error_handling
 def delete_habit(sess, name: str):
     """
     Delete a habit.

@@ -8,8 +8,8 @@ from ritmo.models import models
 
 @click.command(name="done", help="Mark a habit as done.")
 @click.argument("name", nargs=1, type=str)
-@decorators.command_with_local_session
-@decorators.command_with_sqlalchemy_error_handling
+@decorators.with_database
+@decorators.with_sqlalchemy_error_handling
 def mark_done(sess, name: str):
     """
     Mark a habit as done.
@@ -52,8 +52,8 @@ def mark_done(sess, name: str):
 
 @click.command(name="undo", help="Mark a habit as undone.")
 @click.argument("name", nargs=1, type=str)
-@decorators.command_with_local_session
-@decorators.command_with_sqlalchemy_error_handling
+@decorators.with_database
+@decorators.with_sqlalchemy_error_handling
 def mark_undone(sess, name: str):
     """
     Mark a habit as undone.

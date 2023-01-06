@@ -4,9 +4,12 @@ import sqlalchemy.exc
 from ritmo.session import session
 
 
-def command_with_local_session(command):
+def with_database(command):
     """
-    A decorator that creates a local session and passes it to the command.
+    Decorator that creates a database session and passes it to the command.
+
+    Args:
+        command: The command to decorate.
     """
 
     def wrapper(*args, **kwargs):
@@ -17,15 +20,18 @@ def command_with_local_session(command):
     return wrapper
 
 
-def command_with_sqlalchemy_error_handling(command):
+def with_sqlalchemy_error_handling(command):
     """
-    A decorator that handles SQLAlchemy errors and prints them to the console.
+    Decorator that catches SQLAlchemy errors and prints them to the console.
+
+    Args:
+        command: The command to decorate.
     """
 
     def wrapper(*args, **kwargs):
         try:
             command(*args, **kwargs)
         except sqlalchemy.exc.SQLAlchemyError as e:
-            click.echo(f"SQLAlchemy error: {e}")
+            click.echo(f"Error: {e}")
 
     return wrapper

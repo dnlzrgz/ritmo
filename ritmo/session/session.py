@@ -24,6 +24,14 @@ def create_session(path: str) -> sessionmaker:
     return Session
 
 
+def create_memory_session() -> sessionmaker:
+    """
+    Create a new session for an in-memory database.
+    """
+
+    return create_session("sqlite://:memory:")
+
+
 def create_local_session() -> sessionmaker:
     """
     Create a new session for a local database at ~/.ritmo/ritmo.db.

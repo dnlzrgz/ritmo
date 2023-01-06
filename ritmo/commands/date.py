@@ -15,8 +15,8 @@ from ritmo.models import models
     type=click.DateTime(formats=["%Y-%m-%d"]),
     default=datetime.datetime.now(),
 )
-@decorators.command_with_local_session
-@decorators.command_with_sqlalchemy_error_handling
+@decorators.with_database
+@decorators.with_sqlalchemy_error_handling
 def show_date(sess, date: datetime.datetime):
     """
     Show habit status for a specific date.
@@ -57,8 +57,8 @@ def show_date(sess, date: datetime.datetime):
 
 
 @click.command(name="today", help="Show today's habit status.")
-@decorators.command_with_local_session
-@decorators.command_with_sqlalchemy_error_handling
+@decorators.with_database
+@decorators.with_sqlalchemy_error_handling
 def show_today(sess):
     """
     Show today's habit status.

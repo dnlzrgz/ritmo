@@ -16,6 +16,7 @@ sqlalchemy = "^1.4.45"
 pre-commit = "^2.21.0"
 commitizen = "^2.39.1"
 black = {version = "^23.1a1", allow-prereleases = true}
+pytest = "^7.2.0"
 
 [build-system]
 requires = ["poetry-core"]
