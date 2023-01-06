@@ -1,9 +1,11 @@
 import datetime
 
 import click
+from rich.console import Console
+from rich.table import Table
 
+from ritmo.decorators import decorators
 from ritmo.models import models
-from ritmo.session import session
 
 
 @click.command(name="add", help="Add a new habit.")
@@ -38,7 +40,10 @@ from ritmo.session import session
     type=click.DateTime(formats=["%Y-%m-%d"]),
     help="End date in 'Y-m-d' format.",
 )
+@decorators.command_with_local_session
+@decorators.command_with_sqlalchemy_error_handling
 def add_habit(
+    sess,
     name: str,
     description: str,
     type: str,
@@ -49,6 +54,7 @@ def add_habit(
     Add a new habit to the tracking system.
 
     Args:
+        sess: The database session.
         name: The name of the habit.
         description: A description of the habit.
         type: The type of tracking system to use.
@@ -60,32 +66,45 @@ def add_habit(
         click.echo("End date must be after start date.")
         return
 
-    Session = session.create_local_session()
-    with Session.begin() as sess:
-        habit = sess.query(models.Habit).filter(models.Habit.name == name).first()
+    habit = sess.query(models.Habit).filter(models.Habit.name == name).first()
 
-        if habit:
-            return
-        else:
-            sess.add(models.Habit(name=name, description=description, type=type))
-            sess.commit()
+    if habit:
+        return
+    else:
+        sess.add(models.Habit(name=name, description=description, type=type))
+        sess.commit()
 
 
 @click.command(name="list", help="List habits.")
-def list_habits():
+@decorators.command_with_local_session
+@decorators.command_with_sqlalchemy_error_handling
+def list_habits(sess):
     """
     List all habits.
+
+    Args:
+        sess: The database session.
     """
 
-    Session = session.create_local_session()
-    with Session.begin() as sess:
-        habits = sess.query(models.Habit).all()
-        for habit in habits:
-            click.echo(
-                f"Name: {habit.name}, Description: {habit.description}, "
-                f"Type: {habit.type}, Start date: {habit.start_date}, "
-                f"End date: {habit.end_date}"
-            )
+    table = Table(show_header=True, title="Habits")
+    table.add_column("Name")
+    table.add_column("Description")
+    table.add_column("Type")
+    table.add_column("Start date")
+    table.add_column("End date")
+
+    habits = sess.query(models.Habit).all()
+    for habit in habits:
+        table.add_row(
+            habit.name,
+            habit.description if habit.description else "None",
+            habit.type,
+            habit.start_date.strftime("%Y-%m-%d"),
+            habit.end_date.strftime("%Y-%m-%d") if habit.end_date else "None",
+        )
+
+    console = Console()
+    console.print(table)
 
 
 @click.command(name="update", help="Update an existing habit.")
@@ -127,7 +146,10 @@ def list_habits():
     type=click.DateTime(formats=["%Y-%m-%d"]),
     help="End date in UTC format",
 )
+@decorators.command_with_local_session
+@decorators.command_with_sqlalchemy_error_handling
 def update_habit(
+    sess,
     name: str,
     new_name: str,
     description: str,
@@ -139,6 +161,7 @@ def update_habit(
     Update a habit.
 
     Args:
+        sess: The database session.
         name: The name of the habit.
         new_name: The new name of the habit.
         description: A description of the habit.
@@ -155,41 +178,41 @@ def update_habit(
         click.echo("End date must be after start date.")
         return
 
-    Session = session.create_local_session()
-    with Session.begin() as sess:
-        habit = sess.query(models.Habit).filter(models.Habit.name == name).first()
-        if habit:
-            if new_name:
-                habit.name = new_name
-            if description:
-                habit.description = description
-            if type:
-                habit.type = type
-            if start_date:
-                habit.start_date = start_date
-            if end_date:
-                habit.end_date = end_date
-            sess.commit()
-        else:
-            click.echo(f"Habit '{name}' not found.")
+    habit = sess.query(models.Habit).filter(models.Habit.name == name).first()
+    if habit:
+        if new_name:
+            habit.name = new_name
+        if description:
+            habit.description = description
+        if type:
+            habit.type = type
+        if start_date:
+            habit.start_date = start_date
+        if end_date:
+            habit.end_date = end_date
+        sess.commit()
+    else:
+        click.echo(f"Habit '{name}' not found.")
 
 
 @click.command(name="delete", help="Delete a habit.")
 @click.argument("name", nargs=1, type=str, required=True)
-def delete_habit(name: str):
+@decorators.command_with_local_session
+@decorators.command_with_sqlalchemy_error_handling
+def delete_habit(sess, name: str):
     """
     Delete a habit.
 
     Args:
+        sess: The database session.
         name: The name of the habit.
     """
 
-    Session = session.create_local_session()
-    with Session.begin() as sess:
-        habit = sess.query(models.Habit).filter(models.Habit.name == name).first()
+    habit = sess.query(models.Habit).filter(models.Habit.name == name).first()
 
-        if habit:
-            sess.delete(habit)
-            sess.commit()
-        else:
-            click.echo(f"Habit '{name}' not found.")
+    if habit:
+        sess.query(models.HabitDay).filter(
+            models.HabitDay.habit_id == habit.id
+        ).delete()
+        sess.delete(habit)
+        sess.commit()
