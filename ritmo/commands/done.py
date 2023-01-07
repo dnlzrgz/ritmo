@@ -1,16 +1,14 @@
 import datetime
 
 import click
+from sqlalchemy.orm import Session
 
-from ritmo.decorators import decorators
-from ritmo.models import models
+from ritmo.decorators import with_sqlalchemy_error_handling
+from ritmo.models import Habit, HabitDay
+from ritmo.sessions import create_local_session
 
 
-@click.command(name="done", help="Mark a habit as done.")
-@click.argument("name", nargs=1, type=str)
-@decorators.with_database
-@decorators.with_sqlalchemy_error_handling
-def mark_done(sess, name: str):
+def mark_as_done(sess: Session, name: str) -> None:
     """
     Mark a habit as done.
     If the habit is of type 'numerical', the number of completed days will be incremented.
@@ -20,14 +18,14 @@ def mark_done(sess, name: str):
         name: The name of the habit to mark as done. If the habit does not exist, it will not be created.
     """
 
-    habit = sess.query(models.Habit).filter(models.Habit.name == name).first()
+    habit = sess.query(Habit).filter(Habit.name == name).first()
 
     if habit:
         habit_day = (
-            sess.query(models.HabitDay)
+            sess.query(HabitDay)
             .filter(
-                models.HabitDay.habit_id == habit.id
-                and models.HabitDay.date == datetime.datetime.now()
+                HabitDay.habit_id == habit.id
+                and HabitDay.date == datetime.datetime.now()
             )
             .first()
         )
@@ -40,7 +38,7 @@ def mark_done(sess, name: str):
 
             sess.commit()
         else:
-            habit_day = models.HabitDay(habit_id=habit.id)
+            habit_day = HabitDay(habit_id=habit.id)
 
             sess.add(habit_day)
             sess.commit()
@@ -50,11 +48,16 @@ def mark_done(sess, name: str):
         return
 
 
-@click.command(name="undo", help="Mark a habit as undone.")
+@click.command(name="done", help="Mark a habit as done.")
 @click.argument("name", nargs=1, type=str)
-@decorators.with_database
-@decorators.with_sqlalchemy_error_handling
-def mark_undone(sess, name: str):
+@with_sqlalchemy_error_handling
+def mark_as_done_cmd(name: str):
+    local_session = create_local_session()
+    with local_session.begin() as sess:
+        mark_as_done(sess, name)
+
+
+def mark_as_undone(sess: Session, name: str) -> None:
     """
     Mark a habit as undone.
     If the habit is of type 'numerical', the number of times completed will be decremented. If the number of times completed
@@ -65,14 +68,14 @@ def mark_undone(sess, name: str):
         name: The name of the habit to mark as undone.
     """
 
-    habit = sess.query(models.Habit).filter(models.Habit.name == name).first()
+    habit = sess.query(Habit).filter(Habit.name == name).first()
 
     if habit:
         habit_day = (
-            sess.query(models.HabitDay)
+            sess.query(HabitDay)
             .filter(
-                models.HabitDay.habit_id == habit.id
-                and models.HabitDay.date == datetime.datetime.now()
+                HabitDay.habit_id == habit.id
+                and HabitDay.date == datetime.datetime.now()
             )
             .first()
         )
@@ -93,3 +96,12 @@ def mark_undone(sess, name: str):
     else:
         click.echo(f"Habit '{name}' not found.")
         return
+
+
+@click.command(name="undo", help="Mark a habit as undone.")
+@click.argument("name", nargs=1, type=str)
+@with_sqlalchemy_error_handling
+def mark_as_undone_cmd(name: str):
+    local_session = create_local_session()
+    with local_session.begin() as sess:
+        mark_as_undone(sess, name)

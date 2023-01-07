@@ -1,8 +1,16 @@
 import click
 
-from ritmo.commands.crud import add_habit, delete_habit, list_habits, update_habit
-from ritmo.commands.date import show_date, show_today
-from ritmo.commands.manage import mark_done, mark_undone
+from ritmo.commands import (
+    add_habit_cmd,
+    delete_habit_cmd,
+    list_habit_cmd,
+    mark_as_done_cmd,
+    mark_as_undone_cmd,
+    show_date_cmd,
+    show_today_cmd,
+    show_yesterday_cmd,
+    update_habit_cmd,
+)
 
 
 @click.group()
@@ -10,14 +18,15 @@ def cli():
     pass
 
 
-cli.add_command(add_habit)
-cli.add_command(list_habits)
-cli.add_command(update_habit)
-cli.add_command(delete_habit)
-cli.add_command(mark_done)
-cli.add_command(mark_undone)
-cli.add_command(show_date)
-cli.add_command(show_today)
+cli.add_command(add_habit_cmd)
+cli.add_command(list_habit_cmd)
+cli.add_command(update_habit_cmd)
+cli.add_command(delete_habit_cmd)
+cli.add_command(mark_as_done_cmd)
+cli.add_command(mark_as_undone_cmd)
+cli.add_command(show_date_cmd)
+cli.add_command(show_today_cmd)
+cli.add_command(show_yesterday_cmd)
 
 
 def run():
