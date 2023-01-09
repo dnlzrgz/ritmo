@@ -1,9 +1,9 @@
 from pathlib import Path
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
-from ritmo.models import models
+from ritmo.models import Base
 
 
 def create_session(path: str) -> sessionmaker:
@@ -14,14 +14,14 @@ def create_session(path: str) -> sessionmaker:
         path: The path to the database. It must be a valid SQLAlchemy connection string.
     """
 
-    Session = sessionmaker()
+    session = sessionmaker()
     engine = create_engine(path)
 
-    models.Base.metadata.create_all(engine)
+    Base.metadata.create_all(engine)
 
-    Session.configure(bind=engine)
+    session.configure(bind=engine)
 
-    return Session
+    return session
 
 
 def create_memory_session() -> sessionmaker:
@@ -29,7 +29,7 @@ def create_memory_session() -> sessionmaker:
     Create a new session for an in-memory database.
     """
 
-    return create_session("sqlite://:memory:")
+    return create_session("sqlite://")
 
 
 def create_local_session() -> sessionmaker:

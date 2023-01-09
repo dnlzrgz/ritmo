@@ -1,20 +1,21 @@
 import datetime
+from typing import Optional
 
 import click
 from sqlalchemy.orm import Session
 
 from ritmo.decorators import with_sqlalchemy_error_handling
-from ritmo.models import models
-from ritmo.sessions import sessions
+from ritmo.models import Habit
+from ritmo.sessions import create_local_session
 
 
 def add_habit(
     sess: Session,
     name: str,
-    description: str,
-    type: str,
-    start_date: datetime.datetime,
-    end_date: datetime.datetime,
+    description: Optional[str | None],
+    type: Optional[str | None],
+    start_date: Optional[datetime.datetime | None],
+    end_date: Optional[datetime.datetime | None],
 ) -> None:
     """
     Add a new habit to the database.
@@ -32,12 +33,16 @@ def add_habit(
         click.echo("End date must be after start date.")
         return
 
-    habit = sess.query(models.Habit).filter(models.Habit.name == name).first()
+    if not name or name.isspace():
+        click.echo("Habit name must be specified.")
+        return
+
+    habit = sess.query(Habit).filter(Habit.name == name).first()
 
     if habit:
         return
     else:
-        sess.add(models.Habit(name=name, description=description, type=type))
+        sess.add(Habit(name=name, description=description, type=type))
         sess.commit()
 
 
@@ -81,6 +86,6 @@ def add_habit_cmd(
     start_date: datetime.datetime,
     end_date: datetime.datetime,
 ) -> None:
-    local_session = sessions.create_local_session()
+    local_session = create_local_session()
     with local_session.begin() as sess:
         add_habit(sess, name, description, type, start_date, end_date)

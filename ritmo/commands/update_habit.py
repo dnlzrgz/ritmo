@@ -1,4 +1,5 @@
 import datetime
+from typing import Optional
 
 import click
 from sqlalchemy.orm import Session
@@ -11,11 +12,11 @@ from ritmo.sessions import create_local_session
 def update_habit(
     sess: Session,
     name: str,
-    new_name: str,
-    description: str,
-    type: str,
-    start_date: datetime.datetime,
-    end_date: datetime.datetime,
+    new_name: Optional[str | None],
+    description: Optional[str | None],
+    type: Optional[str | None],
+    start_date: Optional[datetime.datetime | None],
+    end_date: Optional[datetime.datetime | None],
 ):
     """
     Update an existing habit.
@@ -36,6 +37,10 @@ def update_habit(
 
     if end_date and start_date and end_date < start_date:
         click.echo("End date must be after start date.")
+        return
+
+    if not name or name.isspace():
+        click.echo("A new valid habit name must be specified.")
         return
 
     habit = sess.query(Habit).filter(Habit.name == name).first()
