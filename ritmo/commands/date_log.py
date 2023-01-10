@@ -12,18 +12,18 @@ from ritmo.sessions import create_local_session
 
 def get_by_date(sess: Session, date: datetime.datetime) -> None:
     """
-    Get habit status for a specific date.
+    Get habit logs for a specific date.
 
     Args:
         sess: The database session.
-        date: The date to show the habit status for (defaults to today).
+        date: The date to show the habit logs for (defaults to today).
     """
 
     habits = sess.query(Habit).all()
     habit_day = sess.query(HabitDay).filter_by(date=date.date())
 
     if habit_day.count() == 0:
-        click.echo(f"No habits status for {date.date()}")
+        click.echo(f"No habits logs for {date.date()}")
         return
 
     table = Table(show_header=True, title=f"{date.date()}")
@@ -49,7 +49,7 @@ def get_by_date(sess: Session, date: datetime.datetime) -> None:
     console.print(table)
 
 
-@click.command(name="date", help="Show habit status for a specific date.")
+@click.command(name="date", help="Show habit logs for a specific date.")
 @click.argument(
     "date",
     nargs=1,
@@ -63,11 +63,11 @@ def show_date_cmd(date: datetime.datetime) -> None:
         get_by_date(sess, date)
 
 
-@click.command(name="today", help="Show today's habit status.")
+@click.command(name="today", help="Show today's habit log.")
 @with_sqlalchemy_error_handling
 def show_today_cmd() -> None:
     """
-    Show today's habit status.
+    Show today's habit logs.
     """
 
     local_session = create_local_session()
@@ -75,11 +75,11 @@ def show_today_cmd() -> None:
         get_by_date(sess, datetime.datetime.utcnow())
 
 
-@click.command(name="yesterday", help="Show yesterday's habit status.")
+@click.command(name="yesterday", help="Show yesterday's habit logs.")
 @with_sqlalchemy_error_handling
 def show_yesterday_cmd() -> None:
     """
-    Show yesterday's habit status.
+    Show yesterday's habit logs.
     """
 
     yesterday_date = datetime.datetime.now() - datetime.timedelta(days=1)

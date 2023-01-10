@@ -18,7 +18,7 @@ def add_habit(
     end_date: Optional[datetime.datetime | None],
 ) -> None:
     """
-    Add a new habit to the database.
+    Add a new habit to be tracked.
 
     Args:
         sess: The database session.
@@ -46,7 +46,7 @@ def add_habit(
         sess.commit()
 
 
-@click.command(name="add", help="Add a new habit.")
+@click.command(name="add", help="Add a new habit to be tracked.")
 @click.argument("name", nargs=1, type=str, required=True)
 @click.option(
     "--description",

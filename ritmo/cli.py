@@ -49,6 +49,11 @@ def cli():
 
 cli.add_command(habits)
 cli.add_command(logs)
+cli.add_command(show_date_cmd)
+cli.add_command(show_today_cmd)
+cli.add_command(show_yesterday_cmd)
+cli.add_command(mark_as_done_cmd)
+cli.add_command(mark_as_undone_cmd)
 
 
 def run():

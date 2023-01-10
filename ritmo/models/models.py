@@ -13,7 +13,6 @@ from sqlalchemy import (
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref, relationship
 
-# Create a base class for the models to inherit from.
 Base: Any = declarative_base()
 
 
