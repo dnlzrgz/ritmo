@@ -3,7 +3,7 @@ import datetime
 from ritmo.commands.add_habit import add_habit
 from ritmo.commands.delete_habit import delete_habit
 from ritmo.commands.done_habit import mark_as_done
-from ritmo.models import Habit, HabitDay
+from ritmo.models import Habit, HabitLog
 from ritmo.sessions import create_memory_session
 
 
@@ -43,10 +43,10 @@ def test_delete_habit_with_logs():
 
         mark_as_done(sess, "Test habit")
         habit_day = (
-            sess.query(HabitDay)
+            sess.query(HabitLog)
             .filter(
-                HabitDay.habit_id == habit.id
-                and HabitDay.date == datetime.datetime.now()
+                HabitLog.habit_id == habit.id
+                and HabitLog.date == datetime.datetime.now()
             )
             .first()
         )
@@ -58,5 +58,5 @@ def test_delete_habit_with_logs():
         habit = sess.query(Habit).filter(Habit.name == "Test habit").first()
         assert habit is None
 
-        habit_day = sess.query(HabitDay).filter(HabitDay.habit_id == habit_id).first()
+        habit_day = sess.query(HabitLog).filter(HabitLog.habit_id == habit_id).first()
         assert habit_day is None

@@ -2,7 +2,7 @@ import click
 from sqlalchemy.orm import Session
 
 from ritmo.decorators import with_sqlalchemy_error_handling
-from ritmo.models import Habit, HabitDay
+from ritmo.models import Habit, HabitLog
 from ritmo.sessions import create_local_session
 
 
@@ -18,7 +18,7 @@ def delete_habit(sess: Session, name: str) -> None:
     habit = sess.query(Habit).filter(Habit.name == name).first()
 
     if habit:
-        sess.query(HabitDay).filter(HabitDay.habit_id == habit.id).delete()
+        sess.query(HabitLog).filter(HabitLog.habit_id == habit.id).delete()
         sess.delete(habit)
         sess.commit()
 

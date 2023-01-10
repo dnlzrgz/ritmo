@@ -36,16 +36,16 @@ class Habit(Base):
     end_date = Column(Date)
 
 
-class HabitDay(Base):
+class HabitLog(Base):
     """
-    HabitDays define the habit_days table.
+    HabitLog define the habit_days table.
     """
 
-    __tablename__ = "habit_days"
+    __tablename__ = "habit_logs"
 
     id = Column(Integer, primary_key=True)
     habit_id = Column(Integer, ForeignKey("habits.id"), nullable=False)
-    habit = relationship("Habit", backref=backref("habit_days", order_by=id))
+    habit = relationship("Habit", backref=backref("habit_logs", order_by=id))
     date = Column(Date, nullable=False, default=datetime.datetime.utcnow)
     completed = Column(Boolean, nullable=False, default=True)
     completed_num = Column(Integer, nullable=False, default=1)

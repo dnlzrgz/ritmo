@@ -6,7 +6,7 @@ from rich.table import Table
 from sqlalchemy.orm import Session
 
 from ritmo.decorators import with_sqlalchemy_error_handling
-from ritmo.models import Habit, HabitDay
+from ritmo.models import Habit, HabitLog
 from ritmo.sessions import create_local_session
 
 
@@ -20,7 +20,7 @@ def get_by_date(sess: Session, date: datetime.datetime) -> None:
     """
 
     habits = sess.query(Habit).all()
-    habit_day = sess.query(HabitDay).filter_by(date=date.date())
+    habit_day = sess.query(HabitLog).filter_by(date=date.date())
 
     if habit_day.count() == 0:
         click.echo(f"No habits logs for {date.date()}")

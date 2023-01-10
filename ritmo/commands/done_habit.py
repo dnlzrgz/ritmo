@@ -4,7 +4,7 @@ import click
 from sqlalchemy.orm import Session
 
 from ritmo.decorators import with_sqlalchemy_error_handling
-from ritmo.models import Habit, HabitDay
+from ritmo.models import Habit, HabitLog
 from ritmo.sessions import create_local_session
 
 
@@ -22,10 +22,10 @@ def mark_as_done(sess: Session, name: str) -> None:
 
     if habit:
         habit_day = (
-            sess.query(HabitDay)
+            sess.query(HabitLog)
             .filter(
-                HabitDay.habit_id == habit.id
-                and HabitDay.date == datetime.datetime.now()
+                HabitLog.habit_id == habit.id
+                and HabitLog.date == datetime.datetime.now()
             )
             .first()
         )
@@ -38,7 +38,7 @@ def mark_as_done(sess: Session, name: str) -> None:
 
             sess.commit()
         else:
-            habit_day = HabitDay(habit_id=habit.id)
+            habit_day = HabitLog(habit_id=habit.id)
 
             sess.add(habit_day)
             sess.commit()
@@ -72,10 +72,10 @@ def mark_as_undone(sess: Session, name: str) -> None:
 
     if habit:
         habit_day = (
-            sess.query(HabitDay)
+            sess.query(HabitLog)
             .filter(
-                HabitDay.habit_id == habit.id
-                and HabitDay.date == datetime.datetime.now()
+                HabitLog.habit_id == habit.id
+                and HabitLog.date == datetime.datetime.now()
             )
             .first()
         )
