@@ -18,7 +18,7 @@ Base: Any = declarative_base()
 
 class Habit(Base):
     """
-    Habits define the habits table.
+    Habits define the habits table which contains the name, description, type, start date, and end date of an habit.
     """
 
     __tablename__ = "habits"
@@ -38,7 +38,7 @@ class Habit(Base):
 
 class HabitLog(Base):
     """
-    HabitLog define the habit_days table.
+    HabitLog define the habit_logs table which contains the habit id, date, completed, and completed_at of an habit.
     """
 
     __tablename__ = "habit_logs"
@@ -48,36 +48,4 @@ class HabitLog(Base):
     habit = relationship("Habit", backref=backref("habit_logs", order_by=id))
     date = Column(Date, nullable=False, default=datetime.datetime.utcnow)
     completed = Column(Boolean, nullable=False, default=True)
-    completed_num = Column(Integer, nullable=False, default=1)
-
-
-class HabitWeek(Base):
-    """
-    HabitWeeks define the habit_weeks table, which contains
-    summary data about the habits for a week.
-    """
-
-    __tablename__ = "habit_weeks"
-
-    id = Column(Integer, primary_key=True)
-    habit_id = Column(Integer, ForeignKey("habits.id"), nullable=False)
-    habit = relationship("Habit", backref=backref("habit_weeks", order_by=id))
-    week_start = Column(Date, nullable=False)
-    completed_days = Column(Integer, nullable=False)
-    modified_date = Column(Date, nullable=False, default=datetime.datetime.utcnow)
-
-
-class HabitMonth(Base):
-    """
-    HabitMonths define the habit_months table, which contains
-    summary data about the habits for a month.
-    """
-
-    __tablename__ = "habit_months"
-
-    id = Column(Integer, primary_key=True)
-    habit_id = Column(Integer, ForeignKey("habits.id"), nullable=False)
-    habit = relationship("Habit", backref=backref("habit_months", order_by=id))
-    month_start = Column(Date, nullable=False)
-    completed_days = Column(Integer, nullable=False)
-    modified_date = Column(Date, nullable=False, default=datetime.datetime.utcnow)
+    completed_at = Column(Date, nullable=False, default=datetime.datetime.utcnow)

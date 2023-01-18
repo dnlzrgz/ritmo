@@ -1,5 +1,3 @@
-import datetime
-
 from ritmo.commands.add_habit import add_habit
 from ritmo.commands.done_habit import mark_as_done, mark_as_undone
 from ritmo.models import Habit, HabitLog
@@ -20,10 +18,9 @@ def test_mark_habit_as_done():
         assert habit.name == "Test habit"
 
         mark_as_done(sess, "Test habit")
-        habit_day = sess.query(HabitLog).filter(HabitLog.habit_id == habit.id).first()
-        assert habit_day is not None
-        assert habit_day.completed is True
-        assert habit_day.completed_num == 1
+        habit_log = sess.query(HabitLog).filter(HabitLog.habit_id == habit.id).first()
+        assert habit_log is not None
+        assert habit_log.completed is True
 
 
 def test_mark_habit_as_undone():
@@ -40,20 +37,20 @@ def test_mark_habit_as_undone():
         assert habit.name == "Test habit"
 
         mark_as_done(sess, "Test habit")
-        habit_day = sess.query(HabitLog).filter(HabitLog.habit_id == habit.id).first()
-        assert habit_day is not None
-        assert habit_day.completed is True
-        assert habit_day.completed_num == 1
+        habit_log = sess.query(HabitLog).filter(HabitLog.habit_id == habit.id).first()
+        assert habit_log is not None
+        assert habit_log.completed is True
 
         mark_as_undone(sess, "Test habit")
-        habit_day = sess.query(HabitLog).filter(HabitLog.habit_id == habit.id).first()
-        assert habit_day is None
+        habit_log = sess.query(HabitLog).filter(HabitLog.habit_id == habit.id).first()
+        assert habit_log is None
 
 
 def test_mark_numerical_habit_done_multiples_times():
     """
     Test marking a numerical habit as done multiple times.
     """
+
     mem_session = create_memory_session()
     with mem_session() as sess:
         add_habit(sess, "Test habit", None, "numerical", None, None)
@@ -66,7 +63,5 @@ def test_mark_numerical_habit_done_multiples_times():
         for i in range(times_done):
             mark_as_done(sess, "Test habit")
 
-        habit_day = sess.query(HabitLog).filter(HabitLog.habit_id == habit.id).first()
-        assert habit_day is not None
-        assert habit_day.completed is True
-        assert habit_day.completed_num == times_done
+        habit_logs = sess.query(HabitLog).filter(HabitLog.habit_id == habit.id).count()
+        assert habit_logs == times_done

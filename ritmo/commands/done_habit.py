@@ -20,32 +20,14 @@ def mark_as_done(sess: Session, name: str) -> None:
 
     habit = sess.query(Habit).filter(Habit.name == name).first()
 
-    if habit:
-        habit_day = (
-            sess.query(HabitLog)
-            .filter(
-                HabitLog.habit_id == habit.id
-                and HabitLog.date == datetime.datetime.now()
-            )
-            .first()
-        )
-
-        if habit_day:
-            habit_day.completed = True
-
-            if habit.type == "numerical":
-                habit_day.completed_num += 1
-
-            sess.commit()
-        else:
-            habit_day = HabitLog(habit_id=habit.id)
-
-            sess.add(habit_day)
-            sess.commit()
-
-    else:
+    if not habit:
         click.echo(f"Habit '{name}' not found.")
-        return
+
+    habit_log = sess.query(HabitLog).filter(HabitLog.habit_id == habit.id)
+    if habit_log.count() == 0 or habit.type == "numerical":
+        habit_day = HabitLog(habit_id=habit.id)
+        sess.add(habit_day)
+        sess.commit()
 
 
 @click.command(name="done", help="Mark a habit as done.")
@@ -70,32 +52,26 @@ def mark_as_undone(sess: Session, name: str) -> None:
 
     habit = sess.query(Habit).filter(Habit.name == name).first()
 
-    if habit:
-        habit_day = (
-            sess.query(HabitLog)
-            .filter(
-                HabitLog.habit_id == habit.id
-                and HabitLog.date == datetime.datetime.now()
-            )
-            .first()
-        )
-
-        if habit_day:
-            if habit.type == "boolean":
-                sess.delete(habit_day)
-
-            if habit.type == "numerical":
-                if habit_day.completed_num > 0:
-                    habit_day.completed_num -= 1
-
-                if habit_day.completed_num == 0:
-                    sess.delete(habit_day)
-
-            sess.commit()
-
-    else:
+    if not habit:
         click.echo(f"Habit '{name}' not found.")
         return
+
+    habit_log = (
+        sess.query(HabitLog)
+        .filter(
+            HabitLog.habit_id == habit.id
+            and habit.completed_at == datetime.datetime.today()
+        )
+        .order_by(HabitLog.completed_at)
+    )
+
+    if habit_log.count() == 0:
+        click.echo(f"Habit '{name}' has not been done today.")
+        return
+    else:
+        habit_log = habit_log.first()
+        sess.delete(habit_log)
+        sess.commit()
 
 
 @click.command(name="undo", help="Mark a habit as undone.")

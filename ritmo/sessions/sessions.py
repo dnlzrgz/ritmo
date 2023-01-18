@@ -15,7 +15,7 @@ def create_session(path: str) -> sessionmaker:
     """
 
     session = sessionmaker()
-    engine = create_engine(path)
+    engine = create_engine(path, future=True)
 
     Base.metadata.create_all(engine)
 

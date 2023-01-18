@@ -20,10 +20,8 @@ def get_by_date(sess: Session, date: datetime.datetime) -> None:
     """
 
     habits = sess.query(Habit).all()
-    habit_day = sess.query(HabitLog).filter_by(date=date.date())
-
-    if habit_day.count() == 0:
-        click.echo(f"No habits logs for {date.date()}")
+    if len(habits) == 0:
+        click.echo("No habits to show.")
         return
 
     table = Table(show_header=True, title=f"{date.date()}")
@@ -31,19 +29,19 @@ def get_by_date(sess: Session, date: datetime.datetime) -> None:
     table.add_column("Completed")
 
     for habit in habits:
-        day_record = habit_day.filter_by(habit_id=habit.id).first()
+        habit_logs = (
+            sess.query(HabitLog)
+            .filter(HabitLog.habit_id == habit.id, HabitLog.date == date.date())
+            .all()
+        )
 
-        if day_record is None:
+        if len(habit_logs) == 0:
             table.add_row(habit.name, "No")
         else:
-            if habit.type == "numerical":
-                times_done = day_record.completed_num
-                if times_done == 1:
-                    table.add_row(habit.name, f"{times_done} time")
-                else:
-                    table.add_row(habit.name, f"{times_done} times")
-            else:
+            if habit.type == "boolean":
                 table.add_row(habit.name, "Yes")
+            else:
+                table.add_row(habit.name, f"{len(habit_logs)} times")
 
     console = Console()
     console.print(table)
