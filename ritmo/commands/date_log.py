@@ -47,7 +47,7 @@ def get_by_date(sess: Session, date: datetime.datetime) -> None:
     console.print(table)
 
 
-@click.command(name="date", help="Show habit logs for a specific date.")
+@click.command(name="logs", help="Show habit logs for a specific date [%Y-%m-%d].")
 @click.argument(
     "date",
     nargs=1,
@@ -61,7 +61,7 @@ def show_date_cmd(date: datetime.datetime) -> None:
         get_by_date(sess, date)
 
 
-@click.command(name="today", help="Show today's habit log.")
+@click.command(name="today", help="Show today's habit logs.")
 @with_sqlalchemy_error_handling
 def show_today_cmd() -> None:
     """

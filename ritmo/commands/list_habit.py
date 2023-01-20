@@ -39,7 +39,7 @@ def list_habit(sess: Session) -> None:
 
 @click.command(name="list", help="List habits.")
 @with_sqlalchemy_error_handling
-def list_habit_cmd():
+def list_habit_cmd(description: bool, start_date: bool, end_date: bool):
     local_session = create_local_session()
     with local_session.begin() as sess:
         list_habit(sess)
